@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python manage.py makemigrations)",
+      "Bash(venv/Scripts/python manage.py migrate)",
+      "Bash(venv/Scripts/python manage.py check)",
+      "Bash(npm list *)",
+      "Bash(rm -f db.sqlite3)",
+      "Bash(rm -f accounts/migrations/0*.py courses/migrations/0*.py payments/migrations/0*.py)",
+      "Bash(venv/Scripts/python manage.py migrate accounts zero)",
+      "Bash(venv/Scripts/python -c ' *)",
+      "Bash(npx tsc *)",
+      "Bash(python manage.py seed_data)",
+      "Bash(venv/Scripts/python.exe manage.py seed_data)",
+      "Bash(venv/Scripts/python.exe manage.py shell -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python manage.py migrate)",
+      "Bash(venv/Scripts/pip install *)",
+      "Bash(venv/Scripts/pip.exe install *)",
+      "Bash(venv/Scripts/python.exe manage.py migrate)",
+      "Bash(venv/Scripts/python.exe manage.py check)",
+      "Bash(venv/Scripts/python.exe -c \"import openpyxl; print\\(openpyxl.__version__\\)\")"
+    ],
+    "additionalDirectories": [
+      "c:\\xampp\\htdocs\\ProyectoSGE\\accounts\\migrations"
+    ]
+  }
+}
