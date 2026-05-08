@@ -4,7 +4,10 @@ import PeopleIcon from '@mui/icons-material/People';
 import SchoolIcon from '@mui/icons-material/School';
 import BookIcon from '@mui/icons-material/Book';
 import PaymentIcon from '@mui/icons-material/Payment';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import { List, ListItem, ListItemText, Divider as MuiDivider } from '@mui/material';
 import { dashboardService } from '../services/dashboardService';
+import { communicationService } from '../services/communicationService';
 import { useAuth } from '../contexts/AuthContext';
 
 interface StatCardProps {
@@ -35,13 +38,19 @@ function StatCard({ label, value, icon, color, sub }: StatCardProps) {
 export default function DashboardPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState({ estudiantes: 0, docentes: 0, materias: 0, pagos: 0, pagosPendientes: 0 });
+  const [comunicados, setComunicados] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    dashboardService.getStats()
-      .then(stats => setStats(stats))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      dashboardService.getStats(),
+      communicationService.getComunicados()
+    ]).then(([statsData, comunicadosData]) => {
+      setStats(statsData);
+      setComunicados(comunicadosData);
+    })
+    .catch(() => {})
+    .finally(() => setLoading(false));
   }, []);
 
   if (loading) return (
@@ -102,14 +111,30 @@ export default function DashboardPage() {
           </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+          <Card sx={{ borderRadius: 3, boxShadow: 2, height: '100%' }}>
             <CardContent>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Módulos disponibles</Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {['Inscripciones', 'Materias', 'Calificaciones', 'Asistencia', 'Pagos', 'Docentes'].map(m => (
-                  <Chip key={m} label={m} color="primary" variant="outlined" size="small" />
-                ))}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <CampaignIcon color="primary" />
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Comunicados Recientes</Typography>
               </Box>
+              <List sx={{ p: 0 }}>
+                {comunicados.map((c, i) => (
+                  <React.Fragment key={c.id}>
+                    <ListItem alignItems="flex-start" sx={{ px: 0 }}>
+                      <ListItemText
+                        primary={c.titulo}
+                        secondary={
+                          <>
+                            <Typography component="span" variant="caption" color="text.primary">{c.fecha_creacion?.split('T')[0]}</Typography>
+                            {" — "}{c.contenido}
+                          </>
+                        }
+                      />
+                    </ListItem>
+                    {i < comunicados.length - 1 && <MuiDivider component="li" />}
+                  </React.Fragment>
+                ))}
+              </List>
             </CardContent>
           </Card>
         </Grid>

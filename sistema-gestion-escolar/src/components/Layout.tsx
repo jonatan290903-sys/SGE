@@ -18,10 +18,13 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import { useAuth } from '../contexts/AuthContext';
 import { useConfig } from '../contexts/ConfigContext';
+import { communicationService } from '../services/communicationService';
 
 const DRAWER_WIDTH = 240;
 
@@ -46,7 +49,18 @@ const NAV_ITEMS: { label: string; icon: React.ReactElement; path: string; roles?
 export default function Layout() {
   const { user, logout } = useAuth();
   const { anios, anioActivo, trimestreActual, periodoVisor, setPeriodoVisor } = useConfig();
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (user) {
+      communicationService.getNotificaciones()
+        .then(notifs => {
+          setUnreadCount(notifs.filter((n: any) => !n.leido).length);
+        })
+        .catch(() => {});
+    }
+  }, [user]);
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -137,6 +151,18 @@ export default function Layout() {
           </IconButton>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>SGE</Typography>
           <Box sx={{ flex: 1 }} />
+          <IconButton
+            color="inherit"
+            sx={{ mr: 1 }}
+            onClick={async () => {
+              await communicationService.marcarLeidas();
+              setUnreadCount(0);
+            }}
+          >
+            <Badge badgeContent={unreadCount} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
           <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: 14 }}>
               {user?.first_name?.[0]}
