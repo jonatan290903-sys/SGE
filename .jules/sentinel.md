@@ -1,0 +1,4 @@
+## 2025-05-15 - [Mass Assignment and Information Leakage]
+**Vulnerability:** Mass Assignment allowed users to self-assign privileged roles (e.g., 'administrativo') during registration or profile updates. Additionally, plaintext passwords were being logged via debug prints.
+**Learning:** Over-reliance on `ModelSerializer` without explicitly restricting sensitive fields like `role` can lead to easy privilege escalation. Defaulting to debug prints in production-ready views exposes sensitive credentials.
+**Prevention:** Always mark administrative fields as `read_only` in serializers used for public-facing endpoints. Explicitly define allowed fields in `RegisterSerializer` instead of using `__all__` or excluding only a few. Use structured logging and never log raw request bodies containing secrets.
