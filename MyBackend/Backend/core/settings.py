@@ -66,19 +66,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.frfrvmwkgyszdkfllcys',
-        'PASSWORD': 'uVm8Lww8v3lRrakk',
-        'HOST': 'aws-1-sa-east-1.pooler.supabase.com',
-        'PORT': '6543',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        conn_max_age=600,
+        ssl_require=False
+    )
 }
+
+# Si estamos en Railway o tenemos la URL de Postgres, el default arriba será sobreescrito.
+# Pero para el sandbox, usaremos SQLite si no hay DATABASE_URL.
 
 # Cache configuration using Redis with fallback to local memory
 CACHES = {
