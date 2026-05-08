@@ -456,38 +456,63 @@ def horario_curso(request, curso_pk):
     periodos_data = request.data.get('periodos', [])
     horario.periodos.all().delete()
 
-    for p_data in periodos_data:
-        periodo = PeriodoHorario.objects.create(
+    # Pre-fetch all active materias for this course to avoid queries inside the loop
+    materias_map = {m.id: m for m in Materia.objects.filter(curso=curso, estado=True)}
+
+    # Bulk create periods first to get their IDs
+    nuevos_periodos = [
+        PeriodoHorario(
             horario=horario,
             orden=p_data['orden'],
             hora_inicio=p_data['hora_inicio'],
             hora_fin=p_data['hora_fin'],
-        )
-        for c_data in p_data.get('clases', []):
-            materia_id = c_data.get('materia_id') or None
-            materia = None
-            if materia_id:
-                try:
-                    materia = Materia.objects.get(pk=materia_id, curso=curso)
-                except Materia.DoesNotExist:
-                    pass
-            ClaseHorario.objects.create(periodo=periodo, dia=c_data['dia'], materia=materia)
+        ) for p_data in periodos_data
+    ]
+    created_periodos = PeriodoHorario.objects.bulk_create(nuevos_periodos)
 
-    # Auto-update numero_horas for each materia in this curso
-    materias_curso = Materia.objects.filter(curso=curso, estado=True)
-    for mat in materias_curso:
-        total_min = 0
-        for p in horario.periodos.prefetch_related('clases').all():
-            for clase in p.clases.filter(materia=mat):
-                inicio = datetime.combine(datetime.today(), p.hora_inicio)
-                fin = datetime.combine(datetime.today(), p.hora_fin)
-                total_min += max(0, int((fin - inicio).total_seconds() // 60))
+    nuevas_clases = []
+    for periodo, p_data in zip(created_periodos, periodos_data):
+        for c_data in p_data.get('clases', []):
+            m_id = c_data.get('materia_id')
+            materia = materias_map.get(m_id) if m_id else None
+            nuevas_clases.append(ClaseHorario(periodo=periodo, dia=c_data['dia'], materia=materia))
+
+    # Bulk create all classes at once
+    if nuevas_clases:
+        ClaseHorario.objects.bulk_create(nuevas_clases)
+
+    # Auto-update numero_horas for each materia based on the new schedule
+    # We calculate everything in memory to minimize DB hits
+    materia_minutos = {m_id: 0 for m_id in materias_map.keys()}
+
+    # Fetch periods with their classes to calculate hours
+    # Use select_related('materia') if needed, but here we only need materia_id
+    periodos_with_clases = PeriodoHorario.objects.filter(horario=horario).prefetch_related('clases')
+
+    for p in periodos_with_clases:
+        inicio = datetime.combine(datetime.today(), p.hora_inicio)
+        fin = datetime.combine(datetime.today(), p.hora_fin)
+        duracion = max(0, int((fin - inicio).total_seconds() // 60))
+
+        for clase in p.clases.all():
+            if clase.materia_id in materia_minutos:
+                materia_minutos[clase.materia_id] += duracion
+
+    to_update = []
+    for m_id, total_min in materia_minutos.items():
+        mat = materias_map[m_id]
         horas = round(total_min / 60)
-        if horas > 0:
+        # Only update if changed to avoid redundant writes
+        if mat.numero_horas != horas:
             mat.numero_horas = horas
-            mat.save(update_fields=['numero_horas'])
+            to_update.append(mat)
+
+    if to_update:
+        Materia.objects.bulk_update(to_update, ['numero_horas'])
 
     horario.save()
+    # Prefetch for efficient serialization
+    horario = HorarioCurso.objects.prefetch_related('periodos__clases__materia').get(pk=horario.pk)
     return Response(HorarioCursoSerializer(horario).data)
 
 
