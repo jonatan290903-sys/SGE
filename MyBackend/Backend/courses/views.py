@@ -440,6 +440,24 @@ def ultima_asistencia(request, pk):
     })
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def asistencia_curso_dia(request, curso_id):
+    """Obtiene toda la asistencia de un curso para una fecha específica (todas sus materias)."""
+    fecha = request.query_params.get('fecha')
+    if not fecha:
+        return Response({'error': 'Se requiere la fecha.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Optimizamos: traemos todas las asistencias de todas las materias del curso en esa fecha
+    # Esto evita N solicitudes desde el frontend (una por materia)
+    qs = Asistencia.objects.filter(
+        materia__curso_id=curso_id,
+        fecha=fecha
+    ).select_related('estudiante__user')
+
+    return Response(AsistenciaSerializer(qs, many=True).data)
+
+
 # ── Horario ────────────────────────────────────────────────────────────────────
 
 @api_view(['GET', 'POST'])
