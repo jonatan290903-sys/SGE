@@ -94,6 +94,10 @@ export const courseService = {
     const { data } = await api.get<Asistencia[]>(`/api/v1/materias/${materiaId}/asistencia/`, { params });
     return data;
   },
+  async getAsistenciaCursoDia(cursoId: number, fecha: string): Promise<Asistencia[]> {
+    const { data } = await api.get<Asistencia[]>(`/api/v1/materias/asistencia-curso/${cursoId}/`, { params: { fecha } });
+    return data;
+  },
   async registrarAsistenciaBulk(materiaId: number, fecha: string, registros: { estudiante: number; estado: EstadoAsistencia; motivo?: string }[]): Promise<Asistencia[]> {
     const { data } = await api.post<Asistencia[]>(`/api/v1/materias/${materiaId}/asistencia/bulk/`, { fecha, registros });
     return data;

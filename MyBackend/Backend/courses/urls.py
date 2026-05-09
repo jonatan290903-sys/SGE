@@ -27,6 +27,7 @@ urlpatterns = [
     path('<int:pk>/asistencia/bulk/', views.registrar_asistencia_bulk, name='asistencia-bulk'),
     path('<int:pk>/resumen-asistencia/', views.resumen_asistencia, name='resumen-asistencia'),
     path('<int:pk>/ultima-asistencia/', views.ultima_asistencia, name='ultima-asistencia'),
+    path('asistencia-curso/<int:curso_id>/', views.asistencia_curso_dia, name='asistencia-curso-dia'),
 
     # Horario
     path('horario/<int:curso_pk>/', views.horario_curso, name='horario-curso'),

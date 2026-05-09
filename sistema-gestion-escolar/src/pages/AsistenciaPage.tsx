@@ -86,17 +86,16 @@ function TabDiaria({ cursos }: { cursos: Curso[] }) {
         return;
       }
 
-      const asistenciasArr = await Promise.all(
-        mats.map(m => courseService.getAsistenciaMateria(m.id, fecha))
-      );
+      // Optimized: Fetch all attendance records for the course in a single batch call
+      const allAsistencias = await courseService.getAsistenciaCursoDia(Number(cursoId), fecha);
 
       const map: Record<number, Record<number, EstadoAsistencia | null>> = {};
       ests.forEach(e => { map[e.id] = {}; });
-      mats.forEach((mat, idx) => {
-        asistenciasArr[idx].forEach((a: Asistencia) => {
-          if (!map[a.estudiante]) map[a.estudiante] = {};
-          map[a.estudiante][mat.id] = a.estado;
-        });
+
+      allAsistencias.forEach((a: Asistencia) => {
+        if (map[a.estudiante]) {
+          map[a.estudiante][a.materia] = a.estado;
+        }
       });
       setAsistencia(map);
       setLoading(false);
