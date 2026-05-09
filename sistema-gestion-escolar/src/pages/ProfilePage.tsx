@@ -199,7 +199,11 @@ export default function ProfilePage() {
                       input: {
                         endAdornment: (
                           <InputAdornment position="end">
-                            <MuiIconButton onClick={() => setShowOldPass(!showOldPass)} edge="end">
+                            <MuiIconButton
+                              onClick={() => setShowOldPass(!showOldPass)}
+                              edge="end"
+                              aria-label={showOldPass ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'}
+                            >
                               {showOldPass ? <VisibilityOff /> : <Visibility />}
                             </MuiIconButton>
                           </InputAdornment>
@@ -219,7 +223,11 @@ export default function ProfilePage() {
                       input: {
                         endAdornment: (
                           <InputAdornment position="end">
-                            <MuiIconButton onClick={() => setShowNewPass(!showNewPass)} edge="end">
+                            <MuiIconButton
+                              onClick={() => setShowNewPass(!showNewPass)}
+                              edge="end"
+                              aria-label={showNewPass ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
+                            >
                               {showNewPass ? <VisibilityOff /> : <Visibility />}
                             </MuiIconButton>
                           </InputAdornment>
@@ -234,6 +242,21 @@ export default function ProfilePage() {
                     required
                     value={passForm.new_password2}
                     onChange={e => setPassForm({ ...passForm, new_password2: e.target.value })}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <MuiIconButton
+                              onClick={() => setShowNewPass(!showNewPass)}
+                              edge="end"
+                              aria-label={showNewPass ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'}
+                            >
+                              {showNewPass ? <VisibilityOff /> : <Visibility />}
+                            </MuiIconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
                   />
                   <Button
                     type="submit"

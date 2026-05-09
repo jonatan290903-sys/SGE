@@ -118,7 +118,11 @@ export default function ForceChangePasswordPage() {
                     startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowOldPass(!showOldPass)} edge="end">
+                        <IconButton
+                          onClick={() => setShowOldPass(!showOldPass)}
+                          edge="end"
+                          aria-label={showOldPass ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'}
+                        >
                           {showOldPass ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
@@ -139,7 +143,11 @@ export default function ForceChangePasswordPage() {
                     startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowNewPass(!showNewPass)} edge="end">
+                        <IconButton
+                          onClick={() => setShowNewPass(!showNewPass)}
+                          edge="end"
+                          aria-label={showNewPass ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
+                        >
                           {showNewPass ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
@@ -157,6 +165,17 @@ export default function ForceChangePasswordPage() {
                 slotProps={{
                   input: {
                     startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowNewPass(!showNewPass)}
+                          edge="end"
+                          aria-label={showNewPass ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'}
+                        >
+                          {showNewPass ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
                   },
                 }}
               />
