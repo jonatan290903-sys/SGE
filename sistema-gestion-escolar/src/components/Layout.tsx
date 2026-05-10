@@ -54,9 +54,10 @@ export default function Layout() {
 
   React.useEffect(() => {
     if (user) {
-      communicationService.getNotificaciones()
-        .then(notifs => {
-          setUnreadCount(notifs.filter((n: any) => !n.leido).length);
+      // Bolt: Fetch only the unread count instead of all notifications to improve performance
+      communicationService.getNotificaciones({ unread_only: 'true', count_only: 'true' })
+        .then(data => {
+          setUnreadCount(data.count);
         })
         .catch(() => {});
     }
