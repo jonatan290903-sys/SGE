@@ -1,0 +1,4 @@
+## 2025-05-15 - Mass Assignment in Registration and Profile Update
+**Vulnerability:** The `role` and `must_change_password` fields in the `accounts` app were susceptible to mass assignment. During registration, a user could self-assign any role (e.g., 'directivo') by including it in the POST data. Similarly, via the profile update endpoint, an authenticated user could change their role or bypass mandatory password changes.
+**Learning:** Default DRF ModelSerializers include all model fields if specified in `Meta.fields`, making them writable unless explicitly added to `read_only_fields` or removed from `fields`.
+**Prevention:** Always explicitly define `read_only_fields` for sensitive attributes like roles, permissions, or internal flags in serializers. For registration, use a dedicated serializer that only includes the necessary user-provided fields.
