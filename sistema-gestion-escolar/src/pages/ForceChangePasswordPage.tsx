@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Box, Card, CardContent, TextField, Button, Typography,
-  Alert, InputAdornment, IconButton, CircularProgress, Stack,
+  Alert, InputAdornment, IconButton, CircularProgress, Stack, Tooltip,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import LockResetIcon from '@mui/icons-material/LockReset';
@@ -118,9 +118,15 @@ export default function ForceChangePasswordPage() {
                     startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowOldPass(!showOldPass)} edge="end">
-                          {showOldPass ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
+                        <Tooltip title={showOldPass ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                          <IconButton
+                            onClick={() => setShowOldPass(!showOldPass)}
+                            edge="end"
+                            aria-label={showOldPass ? "Ocultar contraseña" : "Mostrar contraseña"}
+                          >
+                            {showOldPass ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </Tooltip>
                       </InputAdornment>
                     ),
                   },
@@ -139,9 +145,15 @@ export default function ForceChangePasswordPage() {
                     startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowNewPass(!showNewPass)} edge="end">
-                          {showNewPass ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
+                        <Tooltip title={showNewPass ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                          <IconButton
+                            onClick={() => setShowNewPass(!showNewPass)}
+                            edge="end"
+                            aria-label={showNewPass ? "Ocultar contraseña" : "Mostrar contraseña"}
+                          >
+                            {showNewPass ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </Tooltip>
                       </InputAdornment>
                     ),
                   },

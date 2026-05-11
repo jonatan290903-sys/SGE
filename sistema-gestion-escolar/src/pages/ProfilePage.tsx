@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Box, Typography, Card, TextField, Button, Avatar, Divider,
-  Alert, Stack, CircularProgress, Grid, Paper,
+  Alert, Stack, CircularProgress, Grid, Paper, Tooltip,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import LockIcon from '@mui/icons-material/Lock';
@@ -199,9 +199,15 @@ export default function ProfilePage() {
                       input: {
                         endAdornment: (
                           <InputAdornment position="end">
-                            <MuiIconButton onClick={() => setShowOldPass(!showOldPass)} edge="end">
-                              {showOldPass ? <VisibilityOff /> : <Visibility />}
-                            </MuiIconButton>
+                            <Tooltip title={showOldPass ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                              <MuiIconButton
+                                onClick={() => setShowOldPass(!showOldPass)}
+                                edge="end"
+                                aria-label={showOldPass ? "Ocultar contraseña" : "Mostrar contraseña"}
+                              >
+                                {showOldPass ? <VisibilityOff /> : <Visibility />}
+                              </MuiIconButton>
+                            </Tooltip>
                           </InputAdornment>
                         ),
                       }
@@ -219,9 +225,15 @@ export default function ProfilePage() {
                       input: {
                         endAdornment: (
                           <InputAdornment position="end">
-                            <MuiIconButton onClick={() => setShowNewPass(!showNewPass)} edge="end">
-                              {showNewPass ? <VisibilityOff /> : <Visibility />}
-                            </MuiIconButton>
+                            <Tooltip title={showNewPass ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                              <MuiIconButton
+                                onClick={() => setShowNewPass(!showNewPass)}
+                                edge="end"
+                                aria-label={showNewPass ? "Ocultar contraseña" : "Mostrar contraseña"}
+                              >
+                                {showNewPass ? <VisibilityOff /> : <Visibility />}
+                              </MuiIconButton>
+                            </Tooltip>
                           </InputAdornment>
                         ),
                       }
