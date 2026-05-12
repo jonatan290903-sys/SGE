@@ -135,7 +135,9 @@ export default function Layout() {
             <Typography variant="caption" color="text.secondary" noWrap>{user?.role}</Typography>
           </Box>
           <Tooltip title="Cerrar sesión">
-            <IconButton size="small" onClick={handleLogout}><LogoutIcon fontSize="small" /></IconButton>
+            <IconButton size="small" onClick={handleLogout} aria-label="Cerrar sesión">
+              <LogoutIcon fontSize="small" />
+            </IconButton>
           </Tooltip>
         </Box>
       </Box>
@@ -146,28 +148,44 @@ export default function Layout() {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1, display: { md: 'none' } }}>
         <Toolbar>
-          <IconButton color="inherit" onClick={() => setMobileOpen(!mobileOpen)} sx={{ mr: 2 }}>
-            <MenuIcon />
-          </IconButton>
+          <Tooltip title="Abrir menú">
+            <IconButton
+              color="inherit"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              sx={{ mr: 2 }}
+              aria-label="Abrir menú"
+            >
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>SGE</Typography>
           <Box sx={{ flex: 1 }} />
-          <IconButton
-            color="inherit"
-            sx={{ mr: 1 }}
-            onClick={async () => {
-              await communicationService.marcarLeidas();
-              setUnreadCount(0);
-            }}
-          >
-            <Badge badgeContent={unreadCount} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
-            <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: 14 }}>
-              {user?.first_name?.[0]}
-            </Avatar>
-          </IconButton>
+          <Tooltip title="Notificaciones">
+            <IconButton
+              color="inherit"
+              sx={{ mr: 1 }}
+              onClick={async () => {
+                await communicationService.marcarLeidas();
+                setUnreadCount(0);
+              }}
+              aria-label="Notificaciones"
+            >
+              <Badge badgeContent={unreadCount} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Perfil de usuario">
+            <IconButton
+              color="inherit"
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              aria-label="Perfil de usuario"
+            >
+              <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: 14 }}>
+                {user?.first_name?.[0]}
+              </Avatar>
+            </IconButton>
+          </Tooltip>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
             <MenuItem onClick={() => { navigate('/perfil'); setAnchorEl(null); }}>
               <PersonIcon fontSize="small" sx={{ mr: 1 }} /> Mi Perfil
