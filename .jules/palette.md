@@ -1,0 +1,3 @@
+## 2024-05-12 - [Dynamic Accessibility for Toggle Buttons]
+**Learning:** For icon-only buttons that toggle state (e.g., password visibility), providing a dynamic `aria-label` and `Tooltip` that updates with the state is critical for both screen-reader clarity and visual guidance. In this system, the pattern of wrapping `IconButton` with a `Tooltip` that mirrors the `aria-label` ensures a consistent and accessible experience across different interaction modes.
+**Action:** Always use dynamic strings for `aria-label` and `Tooltip` titles on toggle buttons to describe the resulting action (e.g., "Mostrar contraseña" vs "Ocultar contraseña").
