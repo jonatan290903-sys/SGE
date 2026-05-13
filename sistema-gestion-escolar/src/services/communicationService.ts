@@ -5,8 +5,8 @@ export const communicationService = {
     const { data } = await api.get('/api/v1/communication/comunicados/');
     return data;
   },
-  getNotificaciones: async () => {
-    const { data } = await api.get('/api/v1/communication/notificaciones/');
+  getNotificaciones: async (params?: { unread_only?: boolean; count_only?: boolean }) => {
+    const { data } = await api.get('/api/v1/communication/notificaciones/', { params });
     return data;
   },
   marcarLeidas: async () => {
