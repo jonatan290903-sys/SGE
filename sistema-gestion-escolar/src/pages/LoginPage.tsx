@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Card, CardContent, TextField, Button, Typography,
-  Alert, InputAdornment, IconButton, CircularProgress,
+  Alert, InputAdornment, IconButton, CircularProgress, Tooltip,
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
@@ -90,9 +90,15 @@ export default function LoginPage() {
                   startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPass(!showPass)} edge="end">
-                        {showPass ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                      </IconButton>
+                      <Tooltip title={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
+                        <IconButton
+                          onClick={() => setShowPass(!showPass)}
+                          edge="end"
+                          aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        >
+                          {showPass ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                        </IconButton>
+                      </Tooltip>
                     </InputAdornment>
                   ),
                 },

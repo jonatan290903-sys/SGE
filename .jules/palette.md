@@ -1,0 +1,3 @@
+## 2026-05-13 - [Accessibility pattern for IconButtons]
+**Learning:** Icon-only buttons (like Material UI's `IconButton`) are inaccessible to screen readers and lack visual context on hover without explicit pairing. For full accessibility, they must always be wrapped in a `Tooltip` and include a matching, descriptive `aria-label`. Using specific labels like "Abrir menú de navegación" rather than generic ones like "Menú" significantly improves the experience for assistive technology users.
+**Action:** Always pair `IconButton` with both a `Tooltip` and a descriptive `aria-label` attribute in React/MUI applications.
