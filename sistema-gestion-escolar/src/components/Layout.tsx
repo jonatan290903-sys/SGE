@@ -135,7 +135,13 @@ export default function Layout() {
             <Typography variant="caption" color="text.secondary" noWrap>{user?.role}</Typography>
           </Box>
           <Tooltip title="Cerrar sesión">
-            <IconButton size="small" onClick={handleLogout}><LogoutIcon fontSize="small" /></IconButton>
+            <IconButton
+              size="small"
+              onClick={handleLogout}
+              aria-label="Cerrar sesión"
+            >
+              <LogoutIcon fontSize="small" />
+            </IconButton>
           </Tooltip>
         </Box>
       </Box>
@@ -146,24 +152,36 @@ export default function Layout() {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1, display: { md: 'none' } }}>
         <Toolbar>
-          <IconButton color="inherit" onClick={() => setMobileOpen(!mobileOpen)} sx={{ mr: 2 }}>
+          <IconButton
+            color="inherit"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            sx={{ mr: 2 }}
+            aria-label="Abrir menú de navegación"
+          >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>SGE</Typography>
           <Box sx={{ flex: 1 }} />
+          <Tooltip title="Notificaciones">
+            <IconButton
+              color="inherit"
+              sx={{ mr: 1 }}
+              onClick={async () => {
+                await communicationService.marcarLeidas();
+                setUnreadCount(0);
+              }}
+              aria-label={`${unreadCount} notificaciones sin leer`}
+            >
+              <Badge badgeContent={unreadCount} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
           <IconButton
             color="inherit"
-            sx={{ mr: 1 }}
-            onClick={async () => {
-              await communicationService.marcarLeidas();
-              setUnreadCount(0);
-            }}
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            aria-label="Menú de usuario"
           >
-            <Badge badgeContent={unreadCount} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: 14 }}>
               {user?.first_name?.[0]}
             </Avatar>

@@ -90,7 +90,11 @@ export default function LoginPage() {
                   startAdornment: <InputAdornment position="start"><LockIcon color="action" /></InputAdornment>,
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPass(!showPass)} edge="end">
+                      <IconButton
+                        onClick={() => setShowPass(!showPass)}
+                        edge="end"
+                        aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      >
                         {showPass ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
