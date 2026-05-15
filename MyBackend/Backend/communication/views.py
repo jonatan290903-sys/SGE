@@ -27,6 +27,15 @@ def comunicados_list(request):
 def notificaciones_list(request):
     if request.method == 'GET':
         notificaciones = Notificacion.objects.filter(usuario=request.user)
+
+        # Optimization: Filter by unread status
+        if request.query_params.get('unread_only') == 'true':
+            notificaciones = notificaciones.filter(leido=False)
+
+        # Optimization: Return only the count to avoid serializing full objects
+        if request.query_params.get('count_only') == 'true':
+            return Response({'count': notificaciones.count()})
+
         serializer = NotificacionSerializer(notificaciones, many=True)
         return Response(serializer.data)
 
