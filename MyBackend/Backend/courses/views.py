@@ -17,9 +17,28 @@ from accounts.serializers import EstudianteSerializer
 
 
 def _solo_administrativo(request):
-    if request.user.role != 'administrativo':
+    if request.user.role not in ['administrativo', 'directivo']:
         return Response({'error': 'Solo el personal administrativo puede realizar esta acción.'}, status=status.HTTP_403_FORBIDDEN)
     return None
+
+
+def _check_materia_access(request, materia):
+    """
+    Verifica que el usuario sea administrativo/directivo o el docente asignado a la materia.
+    Retorna un Response(403) si no tiene permiso, o None si tiene acceso.
+    """
+    if request.user.role in ['administrativo', 'directivo']:
+        return None
+
+    if request.user.role == 'docente':
+        # Verificamos si el docente autenticado es el asignado a esta materia
+        if hasattr(request.user, 'docente') and materia.docente == request.user.docente:
+            return None
+
+    return Response(
+        {'error': 'No tienes permiso para modificar datos de esta materia.'},
+        status=status.HTTP_403_FORBIDDEN
+    )
 
 
 # ── Materias ──────────────────────────────────────────────────────────────────
@@ -299,9 +318,14 @@ def guardar_nota(request):
 
     try:
         estudiante = Estudiante.objects.get(pk=estudiante_id)
-        actividad = Actividad.objects.get(pk=actividad_id)
+        actividad = Actividad.objects.select_related('materia').get(pk=actividad_id)
     except (Estudiante.DoesNotExist, Actividad.DoesNotExist):
         return Response({'error': 'Recurso no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Security Check: Only assigned teacher or staff can save grades
+    err = _check_materia_access(request, actividad.materia)
+    if err:
+        return err
 
     obj, _ = Calificacion.objects.update_or_create(
         estudiante=estudiante,
@@ -334,6 +358,11 @@ def registrar_asistencia_bulk(request, pk):
         materia = Materia.objects.get(pk=pk)
     except Materia.DoesNotExist:
         return Response({'error': 'Materia no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Security Check: Only assigned teacher or staff can register attendance
+    err = _check_materia_access(request, materia)
+    if err:
+        return err
 
     from .models import Asistencia as AsistenciaModel
     
