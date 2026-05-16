@@ -13,6 +13,13 @@ from .serializers import PagoSerializer
 def pagos_list(request):
     if request.method == 'GET':
         qs = Pago.objects.select_related('estudiante__user', 'estudiante__curso').all().order_by('-fecha_vencimiento')
+
+        # Security: Students can only see their own payments
+        if request.user.role == 'estudiante':
+            qs = qs.filter(estudiante__user=request.user)
+        elif request.user.role not in ['administrativo', 'directivo']:
+            return Response({'error': 'No tiene permiso para ver los pagos.'}, status=status.HTTP_403_FORBIDDEN)
+
         estudiante_id = request.query_params.get('estudiante')
         estado = request.query_params.get('estado')
         concepto = request.query_params.get('concepto')
@@ -39,9 +46,19 @@ def pagos_list(request):
 @permission_classes([IsAuthenticated])
 def pago_detail(request, pk):
     try:
-        pago = Pago.objects.get(pk=pk)
+        pago = Pago.objects.select_related('estudiante__user').get(pk=pk)
     except Pago.DoesNotExist:
         return Response({'error': 'Pago no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Security: Access control for Pago detail
+    if request.user.role == 'estudiante':
+        if pago.estudiante.user != request.user:
+            return Response({'error': 'No tiene permiso para acceder a este pago.'}, status=status.HTTP_403_FORBIDDEN)
+        if request.method in ['PUT', 'DELETE']:
+            return Response({'error': 'Los estudiantes no pueden modificar pagos.'}, status=status.HTTP_403_FORBIDDEN)
+    elif request.user.role not in ['administrativo', 'directivo']:
+        return Response({'error': 'No tiene permiso para acceder a este pago.'}, status=status.HTTP_403_FORBIDDEN)
+
     if request.method == 'GET':
         return Response(PagoSerializer(pago).data)
     if request.method == 'PUT':
@@ -50,6 +67,8 @@ def pago_detail(request, pk):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # DELETE simulates cancellation
     pago.estado = 'cancelado'
     pago.save()
     return Response(status=status.HTTP_204_NO_CONTENT)
@@ -58,6 +77,10 @@ def pago_detail(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def resumen_pagos(request):
+    # Security: Only admins/directors can see the summary
+    if request.user.role not in ['administrativo', 'directivo']:
+        return Response({'error': 'No tiene permiso para ver el resumen de pagos.'}, status=status.HTTP_403_FORBIDDEN)
+
     cache_key = 'payments_summary'
     data = cache.get(cache_key)
     if not data:
