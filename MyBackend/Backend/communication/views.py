@@ -26,7 +26,16 @@ def comunicados_list(request):
 @permission_classes([IsAuthenticated])
 def notificaciones_list(request):
     if request.method == 'GET':
+        unread_only = request.query_params.get('unread_only') == 'true'
+        count_only = request.query_params.get('count_only') == 'true'
+
         notificaciones = Notificacion.objects.filter(usuario=request.user)
+        if unread_only:
+            notificaciones = notificaciones.filter(leido=False)
+
+        if count_only:
+            return Response({'count': notificaciones.count()})
+
         serializer = NotificacionSerializer(notificaciones, many=True)
         return Response(serializer.data)
 
