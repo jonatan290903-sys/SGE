@@ -1,0 +1,3 @@
+## 2025-05-15 - [Optimized notification badge fetching]
+**Learning:** Fetching and serializing a full list of objects only to filter and count them on the client-side is a common performance anti-pattern. While it might seem trivial for small lists, it scales poorly in terms of database CPU (serialization), network bandwidth, and client-side main thread blocking. Using server-side `count()` is significantly more efficient as it translates to a lightweight `SELECT COUNT(*)` query.
+**Action:** Always check if a list endpoint is being used solely for counting or checking existence. Implement `count_only` or similar parameters to reduce overhead.
