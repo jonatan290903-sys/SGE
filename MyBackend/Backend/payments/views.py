@@ -13,6 +13,11 @@ from .serializers import PagoSerializer
 def pagos_list(request):
     if request.method == 'GET':
         qs = Pago.objects.select_related('estudiante__user', 'estudiante__curso').all().order_by('-fecha_vencimiento')
+
+        # Security: Students can only see their own payments
+        if request.user.role == 'estudiante':
+            qs = qs.filter(estudiante__user=request.user)
+
         estudiante_id = request.query_params.get('estudiante')
         estado = request.query_params.get('estado')
         concepto = request.query_params.get('concepto')
@@ -42,6 +47,11 @@ def pago_detail(request, pk):
         pago = Pago.objects.get(pk=pk)
     except Pago.DoesNotExist:
         return Response({'error': 'Pago no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Security: Students can only access their own payments
+    if request.user.role == 'estudiante' and pago.estudiante.user != request.user:
+        return Response({'error': 'No tiene permiso para acceder a este pago.'}, status=status.HTTP_403_FORBIDDEN)
+
     if request.method == 'GET':
         return Response(PagoSerializer(pago).data)
     if request.method == 'PUT':
@@ -58,6 +68,10 @@ def pago_detail(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def resumen_pagos(request):
+    # Security: Only admins and directors can see the summary
+    if request.user.role not in ['administrativo', 'directivo']:
+        return Response({'error': 'No tiene permiso para ver el resumen de pagos.'}, status=status.HTTP_403_FORBIDDEN)
+
     cache_key = 'payments_summary'
     data = cache.get(cache_key)
     if not data:
