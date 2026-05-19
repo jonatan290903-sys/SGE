@@ -74,6 +74,15 @@ export default function Layout() {
     navigate('/login');
   };
 
+  const handleMarcarLeidas = async () => {
+    try {
+      await communicationService.marcarLeidas();
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Error marking notifications as read:', err);
+    }
+  };
+
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 2, background: 'linear-gradient(135deg, #1976d2, #1565c0)', color: 'white' }}>
@@ -134,8 +143,15 @@ export default function Layout() {
             <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>{user?.first_name} {user?.last_name}</Typography>
             <Typography variant="caption" color="text.secondary" noWrap>{user?.role}</Typography>
           </Box>
+          <Tooltip title="Marcar todas como leídas">
+            <IconButton size="small" onClick={handleMarcarLeidas} aria-label="Marcar todas como leídas">
+              <Badge badgeContent={unreadCount} color="error" slotProps={{ badge: { style: { fontSize: 10 } } }}>
+                <NotificationsIcon fontSize="small" />
+              </Badge>
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Cerrar sesión">
-            <IconButton size="small" onClick={handleLogout}><LogoutIcon fontSize="small" /></IconButton>
+            <IconButton size="small" onClick={handleLogout} aria-label="Cerrar sesión"><LogoutIcon fontSize="small" /></IconButton>
           </Tooltip>
         </Box>
       </Box>
@@ -151,18 +167,18 @@ export default function Layout() {
           </IconButton>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>SGE</Typography>
           <Box sx={{ flex: 1 }} />
-          <IconButton
-            color="inherit"
-            sx={{ mr: 1 }}
-            onClick={async () => {
-              await communicationService.marcarLeidas();
-              setUnreadCount(0);
-            }}
-          >
-            <Badge badgeContent={unreadCount} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <Tooltip title="Marcar todas como leídas">
+            <IconButton
+              color="inherit"
+              sx={{ mr: 1 }}
+              onClick={handleMarcarLeidas}
+              aria-label="Marcar todas como leídas"
+            >
+              <Badge badgeContent={unreadCount} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
           <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: 14 }}>
               {user?.first_name?.[0]}
