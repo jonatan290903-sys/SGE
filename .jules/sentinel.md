@@ -1,0 +1,4 @@
+## 2026-05-19 - [Mass Assignment in DRF Serializers]
+**Vulnerability:** The 'role' and 'must_change_password' fields in the 'accounts' app were vulnerable to mass assignment because they were included in 'UserSerializer.Meta.fields' but not in 'read_only_fields', and 'role' was present in 'RegisterSerializer.Meta.fields'.
+**Learning:** DRF's 'ModelSerializer' automatically allows updates to all fields listed in 'Meta.fields' unless they are explicitly marked as 'read_only_fields'. This can lead to privilege escalation if sensitive fields like roles or permissions are exposed in serializers used by user-facing endpoints.
+**Prevention:** Always identify sensitive fields (roles, permissions, security flags, internal IDs) and ensure they are added to 'read_only_fields' in any serializer that might be used for updates by regular users. For registration, only include fields that are strictly necessary and safe for a new user to provide.
